@@ -7,8 +7,9 @@ import java.sql.SQLException;
 
 public class DBConnect {
 
-	static private final String jdbcUrl = "jdbc:mysql://localhost/meteo?user=root&password=root";
+	static private final String jdbcUrl = "jdbc:mysql://localhost/meteo?user=root";
 	static private DBConnect instance = null;
+	static private Connection connection = null;
 
 	private DBConnect() {
 		instance = this;
@@ -24,9 +25,10 @@ public class DBConnect {
 
 	public Connection getConnection() {
 		try {
-
-			Connection conn = DriverManager.getConnection(jdbcUrl);
-			return conn;
+			
+			if (connection == null || connection.isClosed() ) 
+				connection = DriverManager.getConnection(jdbcUrl);
+			return connection;
 
 		} catch (SQLException e) {
 			e.printStackTrace();

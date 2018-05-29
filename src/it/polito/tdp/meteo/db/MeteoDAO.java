@@ -7,9 +7,42 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import it.polito.tdp.meteo.bean.Citta;
 import it.polito.tdp.meteo.bean.Rilevamento;
 
 public class MeteoDAO {
+	
+	
+	public List <Citta> getAllCitta(){
+		
+		final String sql = "SELECT distinct Localita from situazione";
+		
+		List <Citta> cittaInDB = new ArrayList<>();
+		
+		try {
+			
+			Connection conn = DBConnect.getInstance().getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+
+			ResultSet rs = st.executeQuery();
+
+			while (rs.next()) {
+				
+				Citta c = new Citta(rs.getString(1));
+				
+				cittaInDB.add(c);
+			}
+			
+			conn.close();
+
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+		
+		return cittaInDB;
+	}
 
 	public List<Rilevamento> getAllRilevamenti() {
 
@@ -46,7 +79,34 @@ public class MeteoDAO {
 
 	public Double getAvgRilevamentiLocalitaMese(int mese, String localita) {
 
-		return 0.0;
+		final String sql = "SELECT  avg(umidita) FROM SITUAZIONE where  SUBSTR(Data,6,2) = ? and localita= ? ";
+		
+		double avgUmMese=0;
+		
+		try {
+			
+			Connection conn = DBConnect.getInstance().getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			
+			st.setInt(1,mese);
+			st.setString(2, localita);
+
+			ResultSet rs = st.executeQuery();
+
+            while (rs.next()) {
+             
+				avgUmMese = rs.getDouble(1);
+            }
+							
+				conn.close(); 
+				
+			} catch (SQLException e) {
+				
+				 e.printStackTrace();
+				throw new RuntimeException("Errore Db");
+			}
+					
+		return avgUmMese;
 	}
 
 }
